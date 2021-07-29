@@ -26,17 +26,23 @@ def index(request):
 
     visitor_cookie_handler(request)
     # context_dict['visits'] = int(request.COOKIES.get('visits', '1'))
-    context_dict['visits'] = request.session['visits']
+    # context_dict['visits'] = request.session['visits']
 
     # request.session.set_test_cookie()
     # return render(request, 'rango/index.html', context=context_dict)
-    response = render(request, 'rango/index.html', context=context_dict)
+    # response = render(request, 'rango/index.html', context=context_dict)
     # visitor_cookie_handler(request, response)
-    return response
+    # return response
+    return render(request, 'rango/index.html', context=context_dict)
 
 def about(request):
     # return HttpResponse("Rango says here is the about page. <a href='/rango/'>Index</a>")
-    return render(request, 'rango/about.html')
+    # return render(request, 'rango/about.html')
+    context_dict = {}
+    visitor_cookie_handler(request)
+    context_dict['visits'] = request.session['visits']
+
+    return render(request, 'rango/about.html', context=context_dict)
 
 def show_category(request, category_name_slug):
     context_dict = {}
@@ -149,8 +155,8 @@ def user_logout(request):
     return redirect(reverse('rango:index'))
 
 def visitor_cookie_handler(request):
-    visits = int(request.COOKIES.get('visits', '1'))
-    last_visit_cookie = request.COOKIES.get('last_visit', str(datetime.now()))
+    visits = int(get_server_side_cookie(request, 'visits', '1'))
+    last_visit_cookie = get_server_side_cookie(request, 'last_visit', str(datetime.now()))
     last_visit_time = datetime.strptime(last_visit_cookie[:-7], '%Y-%m-%d %H:%M:%S')
 
     if (datetime.now() - last_visit_time).days > 0:
